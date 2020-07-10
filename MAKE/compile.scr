@@ -1,1 +1,0 @@
-gfortran-mp-7 dEdd_obs.F90 -o dEdd_obs.exe
