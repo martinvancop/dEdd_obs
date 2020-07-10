@@ -19,10 +19,11 @@ Sources are in ./SOURCE, the main program file is called "dEdd_obs.F90".
 The rest of the source files are from IcePack and belong to the radiation scheme.
 
 # Compilation (./MAKE)
-./create_makefile.sh SRC  ---> to create file list
-./create_makefile.sh  ---> to create makefile
-make ---> to compile "dEdd_obs.x"
+1) update source directory in create_makefile.sh
+2) ./create_makefile.sh SRC  ---> to create file list
+3) ./create_makefile.sh  ---> to create makefile
+4) make ---> to compile "dEdd_obs.x"
 
-You can move the executable dEdd_obs.x in ./RUN to make it comfy
+To execute, dEdd_obs.x, you can move it into ./RUN to make it comfy
 
 

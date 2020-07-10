@@ -1,6 +1,6 @@
 #!/bin/sh
 set -xv
-SRCDIR="/Users/ioulianikolskaia/Boulot/SCIENCE/RESEARCH/ICE_OPTICS/DELTA_EDDINGTON/SOURCE/"
+SRCDIR="/Users/ioulianikolskaia/Boulot/SCIENCE/RESEARCH/ICE_OPTICS/DELTA_EDDINGTON/SOURCE/dEdd_obs"
 archfile=./gfortran_mac.inc
 KEY_LIM=""
 cppdefs="${KEY_LIM}"
@@ -15,7 +15,7 @@ exe=dEdd_obs.x
 #create source file lists and exit
 #---------------------------------------------------------------------
 if [ $1 == "SRC" ]; then
-   find ${SRCDIR} -name "*.F90" -print >> LIST_SRC.lst
+   find ${SRCDIR} -name "*.F90" -print > LIST_SRC.lst
 exit 0
 fi
 
