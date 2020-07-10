@@ -1,6 +1,6 @@
 #!/bin/sh
 set -xv
-SRCDIR="/Users/ioulianikolskaia/Boulot/SCIENCE/RESEARCH/ICE_OPTICS/DELTA_EDDINGTON/SOURCE/dEdd_obs"
+SRCDIR="/Users/ioulianikolskaia/Boulot/SCIENCE/RESEARCH/ICE_OPTICS/DELTA_EDDINGTON/dEdd_obs/SOURCE"
 archfile=./gfortran_mac.inc
 KEY_LIM=""
 cppdefs="${KEY_LIM}"
