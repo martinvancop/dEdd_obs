@@ -26,4 +26,9 @@ The rest of the source files are from IcePack and belong to the radiation scheme
 
 To execute, dEdd_obs.x, you can move it into ./RUN to make it comfy
 
+There will be an output text file
+first column  = observed transmittance (%)
+second column = dEdd transmittance (%)
+third column  = CCSM3 transmittance (%)
+
 

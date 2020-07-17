@@ -13,6 +13,7 @@
       PROGRAM dEdd_obs
 
       USE icepack_shortwave
+      USE icepack_parameters
 
       IMPLICIT NONE
 
@@ -32,23 +33,23 @@
          j      , & ! loop index
          k          ! loop index
 
-      LOGICAL (kind=4) :: &
-          heat_capacity, & ! if true, ice has nonzero heat capacity
-          dEdd_algae,    & ! .true. use prognostic chla in dEdd
-          modal_aero       ! .true. use modal aerosol treatment
+!     LOGICAL (kind=4) :: &
+!         heat_capacity, & ! if true, ice has nonzero heat capacity
+!         dEdd_algae,    & ! .true. use prognostic chla in dEdd
+!         modal_aero       ! .true. use modal aerosol treatment
 
       ! dEdd tuning parameters, set in namelist
-      REAL  (kind=8) :: &
-          R_ice , & ! sea ice tuning parameter; +1 > 1sig increase in albedo
-          R_pnd , & ! ponded ice tuning parameter; +1 > 1sig increase in albedo
-          R_snw , & ! snow tuning parameter; +1 > ~.01 change in broadband albedo
-          dT_mlt, & ! change in temp for non-melt to melt snow grain radius change (C)
-          rsnw_mlt, & ! maximum melting snow grain radius (10^-6 m)
-          hs0      , & ! snow depth for transition to bare sea ice (m)
-          pndaspect, & ! ratio of pond depth to pond fraction
-          hs1      , & ! tapering parameter for snow on pond ice
-          hp1      , & ! critical parameter for pond ice thickness
-          kalg         ! algae absorption coefficient
+!     REAL  (kind=8) :: &
+!         R_ice , & ! sea ice tuning parameter; +1 > 1sig increase in albedo
+!         R_pnd , & ! ponded ice tuning parameter; +1 > 1sig increase in albedo
+!         R_snw , & ! snow tuning parameter; +1 > ~.01 change in broadband albedo
+!         dT_mlt, & ! change in temp for non-melt to melt snow grain radius change (C)
+!         rsnw_mlt, & ! maximum melting snow grain radius (10^-6 m)
+!         hs0      , & ! snow depth for transition to bare sea ice (m)
+!         pndaspect, & ! ratio of pond depth to pond fraction
+!         hs1      , & ! tapering parameter for snow on pond ice
+!         hp1      , & ! critical parameter for pond ice thickness
+!         kalg         ! algae absorption coefficient
 
       REAL  (kind=8), DIMENSION(1,1)                 :: & 
           kaer_tab, & ! aerosol mass extinction cross section (m2/kg)
@@ -137,6 +138,24 @@
       LOGICAL  (kind=4) :: &
             initonly    ! flag to indicate init only, default is false
 
+      ! CCSM3 variables
+      REAL (kind=8), ALLOCATABLE, DIMENSION(:) :: &
+            albin,   &   ! ccsm3 variable
+            albsn,   &   ! ccsm3 variable
+            fswsfc,  &   ! ccsm3 variable
+            fswthru, &   ! ccsm3 variable
+            fswthru_vdr, &! ccsm3 variable
+            fswthru_vdf, &! ccsm3 variable
+            fswthru_idr, &! ccsm3 variable
+            fswthru_idf, &! ccsm3 variable
+            fswint       ! ccsm3 variable
+
+      ! CCSM3 variables
+      REAL (kind=8), ALLOCATABLE, DIMENSION(:,:) :: &
+            fswpenl, &   ! ccsm3 variable
+            Iswabs , &   ! ccsm3 variable
+            Sswabs       ! ccsm3 variable
+
       ! Dummy arrays
       REAL (kind=8)                :: zscalar
       REAL (kind=8), DIMENSION(10) :: zarray, zarray_out
@@ -191,6 +210,22 @@
       ALLOCATE( Iswabsn(nilyr+1,ncat) )
       ALLOCATE( fswpenln(nilyr+1,ncat) )
 
+      ! Extra CCSM3 variables
+      ALLOCATE( albin(ncat) )
+      ALLOCATE( albsn(ncat) )
+      ALLOCATE( fswsfc(ncat) )
+      ALLOCATE( fswthru(ncat) )
+      ALLOCATE( fswthru_vdr(ncat) )
+      ALLOCATE( fswthru_vdf(ncat) )
+      ALLOCATE( fswthru_idr(ncat) )
+      ALLOCATE( fswthru_idf(ncat) )
+      ALLOCATE( fswint(ncat) )
+
+      ! Extra CCSM3 variables
+      ALLOCATE( Sswabs(nilyr+1,ncat) )
+      ALLOCATE( Iswabs(nilyr+1,ncat) )
+      ALLOCATE( fswpenl(nilyr+1,ncat) )
+
       ALLOCATE( jday(N_obs) )
       ALLOCATE( lat (N_obs) )
       ALLOCATE( lon (N_obs) )
@@ -208,29 +243,29 @@
       ! Tuning parameters
       !-------------------
       ! There are three albedo tuning parameters
-      R_ice = 0.0d0           ! sea ice tuning parameter; +1 > 1sig increase in albedo
-      R_pnd = 0.0d0           ! ponded ice tuning parameter; +1 > 1sig increase in albedo
-      R_snw = 1.5d0           ! snow tuning parameter; +1 > ~.01 change in broadband albedo
+!     R_ice = 0.0d0           ! sea ice tuning parameter; +1 > 1sig increase in albedo
+!     R_pnd = 0.0d0           ! ponded ice tuning parameter; +1 > 1sig increase in albedo
+!     R_snw = 1.5d0           ! snow tuning parameter; +1 > ~.01 change in broadband albedo
 
       !------------------
       ! Other parameters 
       !------------------
       ! For these parameters, we used default CICE values
 
-      heat_capacity = .FALSE. ! if true, ice has nonzero heat capacity
-      dEdd_algae    = .FALSE. ! .true. use prognostic chla in dEdd ! CHANGE 
-      modal_aero    = .FALSE. ! .true. use modal aerosol treatment
+!     heat_capacity = .FALSE. ! if true, ice has nonzero heat capacity
+!     dEdd_algae    = .FALSE. ! .true. use prognostic chla in dEdd ! CHANGE 
+!     modal_aero    = .FALSE. ! .true. use modal aerosol treatment
 
       l_print_point = .FALSE.
       initonly      = .FALSE.
 
-      dT_mlt = 1.5d0          ! change in temp for non-melt to melt snow grain radius change (C)
-      rsnw_mlt = 1500.d0      ! maximum melting snow grain radius (10^-6 m)
-      hs0      = 0.03d0       ! snow depth for transition to bare sea ice (m)
-      pndaspect = 0.8d0       ! ratio of pond depth to pond fraction
-      hs1       = 0.03d0      ! tapering parameter for snow on pond ice
-      hp1       = 0.01d0      ! critical parameter for pond ice thickness
-      kalg      = 0.6d0       ! algae absorption coefficient
+!     dT_mlt = 1.5d0          ! change in temp for non-melt to melt snow grain radius change (C)
+!     rsnw_mlt = 1500.d0      ! maximum melting snow grain radius (10^-6 m)
+!     hs0      = 0.03d0       ! snow depth for transition to bare sea ice (m)
+!     pndaspect = 0.8d0       ! ratio of pond depth to pond fraction
+!     hs1       = 0.03d0      ! tapering parameter for snow on pond ice
+!     hp1       = 0.01d0      ! critical parameter for pond ice thickness
+!     kalg      = 0.6d0       ! algae absorption coefficient
 
       kaer_tab  = 0.d0        ! OBSOLETE aerosol mass extinction cross section (m2/kg)
       waer_tab  = 0.d0        ! OBSOLETE aerosol single scatter albedo (fraction)
@@ -352,67 +387,94 @@
    
          !----------------------------------------------------------------------------------------------------------------
     
+          WRITE(*,*) ' Delta-Eddington Scheme '
+
           CALL       run_dEdd(dt,       ncat,      &
-                              dEdd_algae,          &
-                              nilyr,    nslyr,     &
-                              aicen,    vicen,     &
-                              vsnon,    Tsfcn,     &
-                              alvln,    apndn,     &
-                              hpndn,    ipndn,     &
-                              aeron,    kalg,      &
-                              trcrn_bgcsw,         &
-                              heat_capacity,       &
-                              tlat,     tlon,      & 
-                              calendar_type,       &
-                              days_per_year,       &
-                              nextsw_cday,   yday, &
-                              sec,      R_ice,     &
-                              R_pnd,    R_snw,     &
-                              dT_mlt,   rsnw_mlt,  &
-                              hs0,      hs1,  hp1, &
-                              pndaspect,           &
-                              kaer_tab, waer_tab,  &
-                              gaer_tab,            &
-                              kaer_bc_tab,         &
-                              waer_bc_tab,         &
-                              gaer_bc_tab,         &
-                              bcenh,               &
-                              modal_aero,          &
-                              swvdr,    swvdf,     &
-                              swidr,    swidf,     &
-                              coszen,   fsnow,     &
-                              alvdrn,   alvdfn,    &
-                              alidrn,   alidfn,    &
-                              fswsfcn,  fswintn,   &
-                              fswthrun,            &
-                              fswthrun_vdr,        &
-                              fswthrun_vdf,        &
-                              fswthrun_idr,        &
-                              fswthrun_idf,        &
-                              fswpenln,            &
-                              Sswabsn,  Iswabsn,   &
-                              albicen,  albsnon,   &
-                              albpndn,  apeffn,    &
-                              snowfracn,           &
-                              dhsn,     ffracn,    &
-                              l_print_point,       &
-                              initonly)
-   
-         !----------------------------------------------------------------------------------------------------------------
-   
+                           dEdd_algae,          &
+                           nilyr,    nslyr,     &
+                           aicen,    vicen,     &
+                           vsnon,    Tsfcn,     &
+                           alvln,    apndn,     &
+                           hpndn,    ipndn,     &
+                           aeron,    kalg,      &
+                           trcrn_bgcsw,         &
+                           heat_capacity,       &
+                           tlat,     tlon,      & 
+                           calendar_type,       &
+                           days_per_year,       &
+                           nextsw_cday,   yday, &
+                           sec,      R_ice,     &
+                           R_pnd,    R_snw,     &
+                           dT_mlt,   rsnw_mlt,  &
+                           hs0,      hs1,  hp1, &
+                           pndaspect,           &
+                           kaer_tab, waer_tab,  &
+                           gaer_tab,            &
+                           kaer_bc_tab,         &
+                           waer_bc_tab,         &
+                           gaer_bc_tab,         &
+                           bcenh,               &
+                           modal_aero,          &
+                           swvdr,    swvdf,     &
+                           swidr,    swidf,     &
+                           coszen,   fsnow,     &
+                           alvdrn,   alvdfn,    &
+                           alidrn,   alidfn,    &
+                           fswsfcn,  fswintn,   &
+                           fswthrun,            &
+                           fswthrun_vdr,        &
+                           fswthrun_vdf,        &
+                           fswthrun_idr,        &
+                           fswthrun_idf,        &
+                           fswpenln,            &
+                           Sswabsn,  Iswabsn,   &
+                           albicen,  albsnon,   &
+                           albpndn,  apeffn,    &
+                           snowfracn,           &
+                           dhsn,     ffracn,    &
+                           l_print_point,       &
+                           initonly)
+
+          WRITE(*,*) ' CCSM3 Scheme           '
+
+          CALL    shortwave_ccsm3 (aicen,    vicen,    & ! ok
+                                  vsnon,    Tsfcn,    & ! ok
+                                  swvdr,    swvdf,    & ! ok
+                                  swidr,    swidf,    & ! ok
+                                  heat_capacity,      & ! ok
+                                  albedo_type,        &
+                                  albicev,  albicei,  &
+                                  albsnowv, albsnowi, &
+                                  ahmax,              &
+                                  alvdrn,   alidrn,   & ! ok
+                                  alvdfn,   alidfn,   & ! ok
+                                  fswsfc,   fswint,   & 
+                                  fswthru,            &
+                                  fswthru_vdr,        &
+                                  fswthru_vdf,        &
+                                  fswthru_idr,        &
+                                  fswthru_idf,        &
+                                  fswpenl,            &
+                                  Iswabs,   SSwabs,   &
+                                  albin,    albsn,    &
+                                  coszen,   ncat,     & ! ok
+                                  nilyr)                ! ok
+
          !----------------------------------------------------------------------------------------------------------------
    
          
          zarray_out(:) = 0.d0
          zarray_out(1) = zarray(9)
-         zarray_out(2) = fswthrun(1) / fsw * 100.
+         zarray_out(2) = fswthrun(1) / fsw * 100. ! dEdd transmittance
+         zarray_out(3) = fswthru(1)  / fsw * 100. ! CCSM3 transmittance
+
          WRITE(11,'(10F7.2)') zarray_out
 
-         WRITE(*,*) ' i_sta =                     : ', i_sta
-         WRITE(*,*) ' Transmitted solar radiation : ', fswthrun
-         WRITE(*,*) ' albicen                     : ', albicen
-         WRITE(*,*) ' albsnon                     : ', albsnon
-         WRITE(*,*) ' albpndn                     : ', albpndn
+!        WRITE(*,*) ' i_sta =                     : ', i_sta
+!        WRITE(*,*) ' Transmitted solar radiation : ', fswthrun
+!        WRITE(*,*) ' albicen                     : ', albicen
+!        WRITE(*,*) ' albsnon                     : ', albsnon
+!        WRITE(*,*) ' albpndn                     : ', albpndn
 
       END DO
 
