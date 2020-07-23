@@ -441,6 +441,7 @@
          ! fractional area of snow cover
          if (hs > puny) then
             asnow = hs / (hs + snowpatch)
+            ! asnow = 1.0 ! MV test
          else
             asnow = c0
          endif
@@ -661,9 +662,12 @@
       !-----------------------------------------------------------------
          if (hs > puny) then
             asnow = hs / (hs + snowpatch)
+            ! MV TEST
+            ! asnow = 1.
          else
             asnow = c0
          endif
+
 
       !-----------------------------------------------------------------
       ! Shortwave flux absorbed at surface, absorbed internally,
@@ -3635,6 +3639,8 @@
       do ks = 1, nslyr
          ! snow density ccsm3 constant value
          rhosnw(ks) = rhos
+         ! quick test
+         ! MV rhosnw(ks) = 600.
          ! snow grain radius between rsnw_nonmelt and rsnw_mlt
          rsnw(ks) = rsnw_nm + (rsnw_mlt-rsnw_nm)*fT
          rsnw(ks) = max(rsnw(ks), rsnw_fresh)

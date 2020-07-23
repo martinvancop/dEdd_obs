@@ -40,11 +40,7 @@
 
       ! dEdd tuning parameters, set in namelist
 !     REAL  (kind=8) :: &
-!         R_ice , & ! sea ice tuning parameter; +1 > 1sig increase in albedo
-!         R_pnd , & ! ponded ice tuning parameter; +1 > 1sig increase in albedo
-!         R_snw , & ! snow tuning parameter; +1 > ~.01 change in broadband albedo
 !         dT_mlt, & ! change in temp for non-melt to melt snow grain radius change (C)
-!         rsnw_mlt, & ! maximum melting snow grain radius (10^-6 m)
 !         hs0      , & ! snow depth for transition to bare sea ice (m)
 !         pndaspect, & ! ratio of pond depth to pond fraction
 !         hs1      , & ! tapering parameter for snow on pond ice
@@ -237,15 +233,7 @@
  
       !----------------------------------------------------------------------------------------------------------------
 
-      WRITE(*,*) ' Observational Challenge to Delta-Eddington '
-
-      !-------------------
-      ! Tuning parameters
-      !-------------------
-      ! There are three albedo tuning parameters
-!     R_ice = 0.0d0           ! sea ice tuning parameter; +1 > 1sig increase in albedo
-!     R_pnd = 0.0d0           ! ponded ice tuning parameter; +1 > 1sig increase in albedo
-!     R_snw = 1.5d0           ! snow tuning parameter; +1 > ~.01 change in broadband albedo
+      WRITE(*,*) ' Observational Challenge to DE and CCSM3 rad schemes'
 
       !------------------
       ! Other parameters 
@@ -260,7 +248,6 @@
       initonly      = .FALSE.
 
 !     dT_mlt = 1.5d0          ! change in temp for non-melt to melt snow grain radius change (C)
-!     rsnw_mlt = 1500.d0      ! maximum melting snow grain radius (10^-6 m)
 !     hs0      = 0.03d0       ! snow depth for transition to bare sea ice (m)
 !     pndaspect = 0.8d0       ! ratio of pond depth to pond fraction
 !     hs1       = 0.03d0      ! tapering parameter for snow on pond ice
@@ -310,6 +297,8 @@
       !----------------------------------------------------------------------------------------------------------------
       OPEN ( UNIT = 10, FILE ="data_obs_optics.txt", ACTION = 'READ' )
       OPEN ( UNIT = 11, FILE ="dEdd_transmittance.txt", ACTION = 'WRITE')
+
+      WRITE(11,*) "  hs(m)  hi(m)  ap(-)  TdEdd  Tccsm3 Tobs "
 
       DO i_sta = 1, N_obs
 
@@ -464,9 +453,12 @@
    
          
          zarray_out(:) = 0.d0
-         zarray_out(1) = zarray(9)
-         zarray_out(2) = fswthrun(1) / fsw * 100. ! dEdd transmittance
-         zarray_out(3) = fswthru(1)  / fsw * 100. ! CCSM3 transmittance
+         zarray_out(1) = h_s(i_sta)
+         zarray_out(2) = h_i(i_sta)
+         zarray_out(3) = a_p(i_sta)
+         zarray_out(4) = fswthrun(1) / fsw * 100. ! dEdd transmittance
+         zarray_out(5) = fswthru(1)  / fsw * 100. ! CCSM3 transmittance
+         zarray_out(6) = zarray(9)
 
          WRITE(11,'(10F7.2)') zarray_out
 
