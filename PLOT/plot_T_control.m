@@ -9,7 +9,7 @@ close all
 indir  = '/Users/ioulianikolskaia/Boulot/SCIENCE/RESEARCH/ICE_OPTICS/DELTA_EDDINGTON/dEdd_obs/RUN/'
 
 %Filename = [ "T_mod_default.txt" ];
-Filename = [ "T_mod_Rsnwmlt_2000.txt" ];
+Filename = [ "dEdd_transmittance.txt" ];
 
 infile = [indir,'/',Filename{1}]
 

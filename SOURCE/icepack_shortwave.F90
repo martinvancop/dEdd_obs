@@ -3639,8 +3639,8 @@
       do ks = 1, nslyr
          ! snow density ccsm3 constant value
          rhosnw(ks) = rhos
-         ! quick test
-         ! MV rhosnw(ks) = 600.
+         ! MV test density depends on temperature
+         ! rhosnw(ks) = rhos + ( 600 - rhos ) * fT
          ! snow grain radius between rsnw_nonmelt and rsnw_mlt
          rsnw(ks) = rsnw_nm + (rsnw_mlt-rsnw_nm)*fT
          rsnw(ks) = max(rsnw(ks), rsnw_fresh)

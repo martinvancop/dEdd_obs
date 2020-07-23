@@ -341,6 +341,11 @@
          swvdf = fsw * 0.24              ! sw down, visible, diffuse (W/m^2)
          swidr = fsw * 0.31              ! sw down, near IR, direct  (W/m^2)
          swidf = fsw * 0.17              ! sw down, near IR, diffuse (W/m^2)
+         !MV test
+!        swvdr = fsw * 0.10              ! sw down, visible, direct  (W/m^2)
+!        swvdf = fsw * 0.40              ! sw down, visible, diffuse (W/m^2)
+!        swidr = fsw * 0.10              ! sw down, near IR, direct  (W/m^2)
+!        swidf = fsw * 0.40              ! sw down, near IR, diffuse (W/m^2)
    
          vicen(1) = h_i(i_sta)  ! volume per unit area of ice (m) - equal to ice thickness
          vsnon(1) = h_s(i_sta)  ! volume per unit area of snow (m) - equal to snow depth

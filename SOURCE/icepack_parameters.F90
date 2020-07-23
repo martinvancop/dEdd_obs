@@ -184,12 +184,13 @@
          ! dEdd tuning parameters, set in namelist
          R_ice      = c0   ,&! sea ice tuning parameter; +1 > 1sig increase in albedo
          R_pnd      = c0   ,&! ponded ice tuning parameter; +1 > 1sig increase in albedo
+         !MV R_pnd      = -1.0  ,&! ponded ice tuning parameter; +1 > 1sig increase in albedo
          R_snw      = c1p5 ,&! snow tuning parameter; +1 > ~.01 change in broadband albedo
-         !MV R_snw      = 1.0  ,&! snow tuning parameter; +1 > ~.01 change in broadband albedo
+         !MV R_snw      = 0.0  ,&! snow tuning parameter; +1 > ~.01 change in broadband albedo
          dT_mlt     = c1p5 ,&! change in temp for non-melt to melt snow grain 
                              ! radius change (C)
          rsnw_mlt   = 1500._dbl_kind,&! maximum melting snow grain radius (10^-6 m)
-         !MV rsnw_mlt   = 2000._dbl_kind,&! maximum melting snow grain radius (10^-6 m)
+         !MV rsnw_mlt   = 1000._dbl_kind,&! maximum melting snow grain radius (10^-6 m)
          kalg       = 0.60_dbl_kind   ! algae absorption coefficient for 0.5 m thick layer
                                       ! 0.5 m path of 75 mg Chl a / m2
       ! weights for albedos 
