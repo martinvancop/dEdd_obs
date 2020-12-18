@@ -1,5 +1,5 @@
 FC=gfortran-mp-7
-LD=gfortran-mp-7
+LD=
 AR=ar
 ARFLAGS=-r
 CPPFLAGS=
